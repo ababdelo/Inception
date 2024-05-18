@@ -1,0 +1,6 @@
+# Ignore editor and IDE-specific files
+.vscode/
+# Ignore OS-specific files
+.DS_Store
+# Ignore .incept.sh
+.incept.sh
