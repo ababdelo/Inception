@@ -9,7 +9,7 @@ RUN \
     # Upgrade all installed packages to their latest versions
     apt-get upgrade -y && \
     # Install nginx web server and openssl for SSL certificate generation
-    apt-get install -y nginx openssl && \
+    apt-get install -y nginx openssl vim && \
     # Create necessary directories for nginx and SSL
     mkdir -p /etc/nginx/ssl/ /var/run/nginx /var/www/wordpress && \
     # Remove the default nginx site configuration
