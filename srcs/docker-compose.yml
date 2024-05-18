@@ -1,0 +1,80 @@
+version: '3.7'
+
+# Define services for Docker containers
+services:
+
+  # MariaDB service
+  mariadb:
+    container_name: mariadb
+    image: mariadb
+    networks:
+      - inception
+    build: 
+      context: requirements/mariadb  # Build context for MariaDB service
+      dockerfile: Dockerfile  # Dockerfile for MariaDB service
+    env_file: .env  # Environment variables file
+    volumes:
+      - mariadb:/var/lib/mysql  # Volume for MariaDB data
+    restart: on-failure  # Restart policy
+    init: true  # Initialize the container
+    expose:
+      - "3306"  # Expose port 3306 for MySQL
+
+  # WordPress service
+  wordpress:
+    container_name: wordpress
+    image: wordpress
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress  # Volume for WordPress files
+    networks:
+      - inception
+    build: 
+      context: requirements/wordpress  # Build context for WordPress service
+      dockerfile: Dockerfile  # Dockerfile for WordPress service
+    depends_on:
+      - mariadb  # Depend on the MariaDB service
+    restart: on-failure
+    init: true
+    expose:
+      - "9000"  # Expose port 9000 for WordPress
+
+  # Nginx service
+  nginx:
+    container_name: nginx
+    image: nginx
+    networks:
+      - inception
+    depends_on:
+      - wordpress  # Depend on the WordPress service
+    build: 
+      context: requirements/nginx  # Build context for Nginx service
+      dockerfile: Dockerfile  # Dockerfile for Nginx service
+    env_file: .env
+    volumes:
+      - wordpress:/var/www/wordpress  # Mount WordPress files
+    ports:
+      - "443:443"  # Expose port 443 for HTTPS
+    init: true
+    restart: on-failure
+
+# Define custom networks
+networks:
+  inception:
+    name: inception
+
+# Define volumes for persistent data storage
+volumes:
+  mariadb:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/ababdelo/data/mariadb'  # Path to MariaDB data directory
+      
+  wordpress:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/ababdelo/data/wordpress'  # Path to WordPress data directory
