@@ -23,9 +23,9 @@ RUN \
     # Make the script executable
     chmod +x /usr/local/bin/script.sh && \
     # Set permissions for the web directory to be writable
-    chmod 0777 /var/www/html && \
+    chmod 0777 /var/www/wordpress && \
     # Change ownership of the web directory to the www-data user and group
-    chown -R www-data:www-data /var/www/html
+    chown -R www-data:www-data /var/www/wordpress
 
 # Specify the command to run when the container starts
 CMD ["/usr/local/bin/script.sh"]

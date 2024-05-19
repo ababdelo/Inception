@@ -36,7 +36,7 @@ services:
       - mariadb  # Depend on the MariaDB service
     restart: on-failure
     init: true
-    expose:
+    ports:
       - "9000"  # Expose port 9000 for WordPress
 
   # Nginx service

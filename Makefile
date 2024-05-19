@@ -6,7 +6,7 @@
 #    By: ababdelo <ababdelo@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/18 15:00:03 by ababdelo          #+#    #+#              #
-#    Updated: 2024/05/18 17:12:42 by ababdelo         ###   ########.fr        #
+#    Updated: 2024/05/19 10:48:44 by ababdelo         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -92,6 +92,9 @@ fclean: clean
 	${HIDE}printf "${RED}Deleting local data directories...${RESET}\n"
 	${RM} $(MARIADB_VLM) $(WORDPRESS_VLM)
 	${HIDE}printf "${GREEN}All Docker volumes and directories have been removed.${RESET}\n"
+	${HIDE}printf "${RED}Removing Docker Build cache...${RESET}\n"
+	${HIDE}docker builder prune --all -f
+	${HIDE}printf "${GREEN}Full cleanup successfully finished.${RESET}\n"
 
 # Target to perform a full clean and rebuild containers
 re: fclean all
