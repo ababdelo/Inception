@@ -1,8 +1,8 @@
 
 <div align="center">
 
-<h1 style="color:CornflowerBlue;"> Inception <img width="64px" align="center" src=".assets/icons/docker.png" /></h1>
-<img src=".assets/Project-DRK-Card.png"/>
+<h1 style="color:CornflowerBlue;"> Inception <img width="64px" align="center" src=".assets/icons/docker.png" /></h1><br>
+<img src=".assets/images/Project-DRK-Card.png" height="345px" width="700px"/><br><br/>
 
 </div>
 
@@ -14,7 +14,7 @@ Get hands-on with **Containerization**, building **Custom Images**, and managing
 
 ### Preview :
 <div align="center">
-  <img height="375px" src=".assets/Preview.png" />
+  <img height="375px" src=".assets/images/Preview.png" />
 </div>
 
 ---
