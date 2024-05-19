@@ -3,3 +3,5 @@
 .assets/*
 license.md
 readme.md
+
+.env
