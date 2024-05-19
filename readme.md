@@ -70,7 +70,7 @@ The project involves creating three containers, each based on a minimal OS image
 
 ---
 
-## ` License`
+## License :
 
 This project is licensed under the [MIT License](license.md).
 
