@@ -6,7 +6,7 @@
 #    By: ababdelo <ababdelo@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/18 15:00:03 by ababdelo          #+#    #+#              #
-#    Updated: 2024/05/19 10:48:44 by ababdelo         ###   ########.fr        #
+#    Updated: 2024/05/19 14:12:59 by ababdelo         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -125,7 +125,10 @@ nginx:
 	${HIDE}docker-compose -f srcs/docker-compose.yml exec nginx bash
 
 mariadb:
-	${HIDE}docker-compose -f srcs/docker-compose.yml exec nginx bash
+	${HIDE}docker-compose -f srcs/docker-compose.yml exec mariadb bash
+
+wordpress:
+	${HIDE}docker-compose -f srcs/docker-compose.yml exec wordpress bash
 
 # Target to display help information
 help:
