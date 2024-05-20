@@ -2,10 +2,10 @@
 FROM debian:11
 
 # Update package lists
-RUN apt-get update -y
+RUN apt-get update && apt-get upgrade -y
 
 # Install wget and PHP dependencies
-RUN apt-get install -y wget php7.4 php-fpm php-mysql
+RUN apt-get install -y wget vim php7.4 php-fpm php-mysql
 
 # Download and extract WordPress
 RUN wget https://fr.wordpress.org/wordpress-6.0-fr_FR.tar.gz -P /var/www && \

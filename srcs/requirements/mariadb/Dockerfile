@@ -3,7 +3,7 @@
 FROM debian:11
 
 # Update the package lists and install MariaDB server
-RUN apt update -y && apt-get install mariadb-server -y
+RUN apt update -y && apt-get install mariadb-server wget vim -y
 
 # Copy the custom MariaDB configuration file into the container
 COPY conf/mariadb.cnf /etc/mysql/mariadb.conf.d/50-server.cnf

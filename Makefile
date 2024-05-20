@@ -6,7 +6,7 @@
 #    By: ababdelo <ababdelo@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/18 15:00:03 by ababdelo          #+#    #+#              #
-#    Updated: 2024/05/19 15:05:14 by ababdelo         ###   ########.fr        #
+#    Updated: 2024/05/20 10:28:15 by ababdelo         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -15,7 +15,7 @@
 # ================================================= #
 
 # Phony targets to prevent conflicts with files named like targets
-.PHONY: all build clean fclean re status start stop logs help
+.PHONY: all build clean fclean re status start stop logs help crct
 
 # Hide calls
 export VERBOSE = TRUE
@@ -81,19 +81,26 @@ build:
 
 # Target to stop and remove containers and associated images
 clean:
-	${HIDE}printf "${YELLOW}Stopping and removing Docker containers and images...${RESET}\n"
+	${HIDE}printf "${RED}Stopping and removing Docker containers and images...${RESET}\n"
 	${HIDE}docker-compose -f $(DOCKER_COMPOSE_FILE) down --rmi all
 	${HIDE}printf "${GREEN}Docker containers and associated images have been cleaned up.${RESET}\n"
 
-# Target to perform a full cleanup (including volumes and directories)
+# Target to perform a full cleanup (including volumes and directories and building cache)
 fclean: clean
-	${HIDE}printf "${RED}Removing Docker volumes...${RESET}\n"
-	${HIDE}docker-compose -f $(DOCKER_COMPOSE_FILE) down -v
+	${HIDE}printf "${RED}Stopping all containers...${RESET}\n"
+	${HIDE}if [ -n "$$(docker ps -qa)" ]; then docker stop $$(docker ps -qa) || echo "Failed to stop containers"; fi
+	${HIDE}printf "${RED}Removing all containers...${RESET}\n"
+	${HIDE}if [ -n "$$(docker ps -qa)" ]; then docker rm $$(docker ps -qa) || echo "Failed to remove containers"; fi
 	${HIDE}printf "${RED}Deleting local data directories...${RESET}\n"
-	${RM} $(MARIADB_VLM) $(WORDPRESS_VLM)
-	${HIDE}printf "${GREEN}All Docker volumes and directories have been removed.${RESET}\n"
+	${HIDE}${RM} -r $(MARIADB_VLM) $(WORDPRESS_VLM)
 	${HIDE}printf "${RED}Removing Docker Build cache...${RESET}\n"
-	${HIDE}docker builder prune --all -f
+	${HIDE}docker builder prune --all -f || echo "Failed to prune Docker build cache"
+	${HIDE}printf "${RED}Removing all images...${RESET}\n"
+	${HIDE}if [ -n "$$(docker images -qa)" ]; then docker rmi $$(docker images -qa) || echo "Failed to remove images"; fi
+	${HIDE}printf "${RED}Removing all volumes...${RESET}\n"
+	${HIDE}if [ -n "$$(docker volume ls -q)" ]; then docker volume rm $$(docker volume ls -q) || echo "Failed to remove volumes"; fi
+	${HIDE}printf "${RED}Removing all networks...${RESET}\n"
+	${HIDE}if [ -n "$$(docker network ls -q)" ]; then docker network rm $$(docker network ls -q) 2>/dev/null || echo "No user-defined network to remove"; fi
 	${HIDE}printf "${GREEN}Full cleanup successfully finished.${RESET}\n"
 
 # Target to perform a full clean and rebuild containers
