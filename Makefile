@@ -6,7 +6,7 @@
 #    By: ababdelo <ababdelo@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/18 15:00:03 by ababdelo          #+#    #+#              #
-#    Updated: 2024/05/20 10:28:15 by ababdelo         ###   ########.fr        #
+#    Updated: 2024/10/21 09:51:23 by ababdelo         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -136,6 +136,12 @@ mariadb:
 
 wordpress:
 	${HIDE}docker-compose -f srcs/docker-compose.yml exec wordpress bash
+
+evaluate:
+	docker stop $(docker ps -qa); docker rm $(docker ps -qa)
+	docker rmi -f $(docker images -qa)
+	docker volume rm $(docker volume ls -q)
+	docker network rm $(docker network ls -q) 2>/dev/null
 
 # Target to display help information
 help:
