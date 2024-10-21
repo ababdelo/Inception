@@ -70,11 +70,11 @@ volumes:
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/home/${USER}/data/mariadb'  # Path to MariaDB data directory
+      device: '/home/ababdelo/data/mariadb'  # Path to MariaDB data directory
       
   wordpress:
     driver: local
     driver_opts:
       type: 'none'
       o: 'bind'
-      device: '/home/${USER}/data/wordpress'  # Path to WordPress data directory
+      device: '/home/ababdelo/data/wordpress'  # Path to WordPress data directory
