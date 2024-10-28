@@ -6,7 +6,7 @@
 #    By: ababdelo <ababdelo@student.1337.ma>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/18 15:00:03 by ababdelo          #+#    #+#              #
-#    Updated: 2024/10/21 09:51:23 by ababdelo         ###   ########.fr        #
+#    Updated: 2024/10/28 11:30:36 by ababdelo         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -15,7 +15,10 @@
 # ================================================= #
 
 # Phony targets to prevent conflicts with files named like targets
-.PHONY: all build clean fclean re status start stop logs help crct
+.PHONY: all build clean fclean re status start stop logs help evaluate shell
+
+# Default target: Display help message
+.DEFAULT_GOAL := help
 
 # Hide calls
 export VERBOSE = TRUE
@@ -68,11 +71,7 @@ MKDIR = ${HIDE}mkdir -p
 # ================================================= #
 
 # Default target: builds the Docker containers
-all: build
-	${HIDE}printf "${GREEN}All containers have finished building.${RESET}\n"
-
-# Target to build Docker containers
-build:
+all:
 	${HIDE}printf "${CYAN}Creating necessary directories...${RESET}\n"
 	${MKDIR} $(WORDPRESS_VLM) $(MARIADB_VLM)
 	${HIDE}printf "${CYAN}Building Docker containers...${RESET}\n"
@@ -128,33 +127,69 @@ logs:
 	${HIDE}printf "${CYAN}Displaying Docker container logs...${RESET}\n"
 	${HIDE}docker-compose -f $(DOCKER_COMPOSE_FILE) logs
 
-nginx:
-	${HIDE}docker-compose -f srcs/docker-compose.yml exec nginx bash
-
-mariadb:
-	${HIDE}docker-compose -f srcs/docker-compose.yml exec mariadb bash
-
-wordpress:
-	${HIDE}docker-compose -f srcs/docker-compose.yml exec wordpress bash
+# Target to open a bash shell in the chosen container
+shell:
+	${HIDE}printf "${CYAN}Choose a service to open a shell:${RESET}\n"
+	${HIDE}printf "${GREEN}1) mariadb${RESET}\n"
+	${HIDE}printf "${YELLOW}2) wordpress${RESET}\n"
+	${HIDE}printf "${BLUE}3) nginx${RESET}\n"
+	${HIDE}read -p "Enter your choice (1-3): " choice; \
+	case $$choice in \
+		1) printf "${GREEN}Opening shell for mariadb...${RESET}\n"; \
+		   docker-compose -f $(DOCKER_COMPOSE_FILE) exec mariadb bash ;; \
+		2) printf "${YELLOW}Opening shell for wordpress...${RESET}\n"; \
+		   docker-compose -f $(DOCKER_COMPOSE_FILE) exec wordpress bash ;; \
+		3) printf "${BLUE}Opening shell for nginx...${RESET}\n"; \
+		   docker-compose -f $(DOCKER_COMPOSE_FILE) exec nginx bash ;; \
+		*) printf "${RED}Invalid choice. Please select a valid option.${RESET}\n"; \
+	esac
 
 evaluate:
-	docker stop $(docker ps -qa); docker rm $(docker ps -qa)
-	docker rmi -f $(docker images -qa)
-	docker volume rm $(docker volume ls -q)
-	docker network rm $(docker network ls -q) 2>/dev/null
+	${HIDE}printf "${YELLOW}Stopping all containers...${RESET}\n"
+	${HIDE}if [ -n "$$(docker ps -qa)" ]; then \
+		docker stop $$(docker ps -qa) || printf "${RED}Couldn't stop some containers${RESET}\n"; \
+	else \
+		printf "${GREY}No containers to stop${RESET}\n"; \
+	fi
+	${HIDE}printf "${YELLOW}Removing all containers...${RESET}\n"
+	${HIDE}if [ -n "$$(docker ps -qa)" ]; then \
+		docker rm $$(docker ps -qa) || printf "${RED}Couldn't remove some containers${RESET}\n"; \
+	else \
+		printf "${GREY}No containers to remove${RESET}\n"; \
+	fi
+	${HIDE}printf "${YELLOW}Removing all images...${RESET}\n"
+	${HIDE}if [ -n "$$(docker images -qa)" ]; then \
+		docker rmi -f $$(docker images -qa) || printf "${RED}Couldn't remove some images${RESET}\n"; \
+	else \
+		printf "${GREY}No images to remove${RESET}\n"; \
+	fi
+	${HIDE}printf "${YELLOW}Removing all volumes...${RESET}\n"
+	${HIDE}if [ -n "$$(docker volume ls -q)" ]; then \
+		docker volume rm $$(docker volume ls -q) || printf "${RED}Couldn't remove some volumes${RESET}\n"; \
+	else \
+		printf "${GREY}No volumes to remove${RESET}\n"; \
+	fi
+	${HIDE}printf "${YELLOW}Removing custom networks...${RESET}\n"
+	${HIDE}if [ -n "$$(docker network ls --filter 'type=custom' -q)" ]; then \
+		docker network rm $$(docker network ls --filter 'type=custom' -q) || printf "${RED}Couldn't remove some custom networks${RESET}\n"; \
+	else \
+		printf "${GREY}No custom networks to remove${RESET}\n"; \
+	fi
+	${HIDE}printf "${GREEN}Environment cleanup completed. Ready for evaluation.${RESET}\n"
 
 # Target to display help information
 help:
 	${HIDE}printf "${WHITE}\nUsage: make [target]\n\n${RESET}"
 	${HIDE}printf "Targets:\n"
-	${HIDE}printf "  ${GREEN}all${RESET}       : Build Docker containers (default)\n"
-	${HIDE}printf "  ${CYAN}build${RESET}     : Build Docker containers\n"
-	${HIDE}printf "  ${YELLOW}clean${RESET}     : Stop and remove containers and images\n"
-	${HIDE}printf "  ${RED}fclean${RESET}    : Perform a full cleanup (including volumes and directories)\n"
-	${HIDE}printf "  ${CYAN}re${RESET}        : Perform a full clean and rebuild containers\n"
-	${HIDE}printf "  ${ORANGE}status${RESET}    : Display the status of containers\n"
-	${HIDE}printf "  ${GREEN}start${RESET}     : Start all containers\n"
-	${HIDE}printf "  ${RED}stop${RESET}      : Stop all containers\n"
-	${HIDE}printf "  ${BLUE}logs${RESET}      : Display logs of containers\n"
+	${HIDE}printf "  ${GREEN}all${RESET}       : Build and start Docker containers\n"
+	${HIDE}printf "  ${CYAN}evaluate${RESET}  : Clean up all Docker containers, images, volumes, and networks for evaluation ${GREEN}(default)${RESET}\n"
+	${HIDE}printf "  ${YELLOW}clean${RESET}     : Stop and remove only containers and images\n"
+	${HIDE}printf "  ${RED}fclean${RESET}    : Full cleanup (containers, images, volumes, and directories)\n"
+	${HIDE}printf "  ${CYAN}re${RESET}        : Run fclean, then rebuild and start containers\n"
+	${HIDE}printf "  ${ORANGE}status${RESET}    : Display the status of Docker containers\n"
+	${HIDE}printf "  ${GREEN}start${RESET}     : Start all Docker containers without rebuilding\n"
+	${HIDE}printf "  ${RED}stop${RESET}      : Stop all running Docker containers\n"
+	${HIDE}printf "  ${BLUE}logs${RESET}      : Display real-time logs from containers\n"
+	${HIDE}printf "  ${MAGENTA}shell${RESET}     : Open a shell for a selected container (options: mariadb, wordpress, nginx)\n"
 	${HIDE}printf "  ${WHITE}help${RESET}      : Display this help message\n"
 	${HIDE}printf "${WHITE}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${RESET}"
