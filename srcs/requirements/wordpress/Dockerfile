@@ -7,11 +7,11 @@ RUN apt-get update && apt-get upgrade -y
 # Install wget and PHP dependencies
 RUN apt-get install -y wget vim php7.4 php-fpm php-mysql
 
-# Download and extract WordPress
-RUN wget https://fr.wordpress.org/wordpress-6.0-fr_FR.tar.gz -P /var/www && \
+# Download and extract WordPress (latest version)
+RUN wget https://wordpress.org/wordpress-6.6.2.tar.gz -P /var/www && \
     cd /var/www && \
-    tar -xzf wordpress-6.0-fr_FR.tar.gz && \
-    rm wordpress-6.0-fr_FR.tar.gz
+    tar -xzf wordpress-6.6.2.tar.gz && \
+    rm wordpress-6.6.2.tar.gz
 
 # Download and install WP-CLI
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
